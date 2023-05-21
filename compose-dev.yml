@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:15.3-alpine
+    environment:
+      POSTGRES_DB: survey-app
+      POSTGRES_PASSWORD: sup3rStr0ngPassw0rd
+    ports:
+      - 5432:5432
+    volumes:
+      - survey-app-dev-data:/var/lib/postgresql/data
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile-dev
+    environment:
+      DATABASE_URL: postgresql://postgres:sup3rStr0ngPassw0rd@db:5432/survey-app
+    ports:
+      - 3000:3000
+      - 5555:5555
+    volumes:
+      - ./:/usr/src/app/
+    command: npm run start:dev
+    depends_on:
+      - db
+
+volumes:
+  survey-app-dev-data:

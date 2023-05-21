@@ -1,0 +1,62 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["views"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int          @id @default(autoincrement())
+  email      String       @unique
+  username   String       @unique
+  password   String
+  createdAt  DateTime     @default(now())
+  blocked    Boolean      @default(false)
+  Survey     Survey[]
+  AnswerUser AnswerUser[]
+
+  @@index([id])
+}
+
+model Survey {
+  id         String   @id @default(uuid())
+  title      String
+  createdAt  DateTime @default(now())
+  createBy   User     @relation(fields: [createById], references: [id])
+  createById Int
+  Answer     Answer[]
+
+  @@index([id])
+  @@index([createById])
+}
+
+model Answer {
+  id          Int          @id @default(autoincrement())
+  description String
+  survey      Survey       @relation(fields: [surveyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  surveyId    String
+  AnswerUser  AnswerUser[]
+
+  @@index([id])
+  @@index([surveyId])
+}
+
+model AnswerUser {
+  answer    Answer   @relation(fields: [answerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  answerId  Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  userId    Int
+  createdAt DateTime @default(now())
+
+  @@id([answerId, userId])
+  @@index([answerId, userId])
+}
+
+view SurveyWithAnswer {
+  id            String @unique
+  surveyTitle   String
+  respondsCount Int
+}
