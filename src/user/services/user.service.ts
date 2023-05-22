@@ -101,6 +101,38 @@ export class UserService {
       });
   }
 
+  blockUser(id: string) {
+    return this.prismaService.user
+      .update({
+        select: this.prismaHelper.generateSelectFields(UserDto),
+        where: { id: id },
+        data: { blocked: true },
+      })
+      .then((user) => {
+        this.cacheHelper.del([
+          /^users:getUsers:.+$/,
+          new RegExp(`^user:getUserById:${id}$`),
+        ]);
+        return user;
+      });
+  }
+
+  unlockUser(id: string) {
+    return this.prismaService.user
+      .update({
+        select: this.prismaHelper.generateSelectFields(UserDto),
+        where: { id: id },
+        data: { blocked: false },
+      })
+      .then((user) => {
+        this.cacheHelper.del([
+          /^users:getUsers:.+$/,
+          new RegExp(`^user:getUserById:${id}$`),
+        ]);
+        return user;
+      });
+  }
+
   deleteUser(id: string) {
     return this.prismaService.user
       .delete({
@@ -113,6 +145,17 @@ export class UserService {
           new RegExp(`^user:getUserById:${id}$`),
         ]);
         return user;
+      });
+  }
+
+  userIsBlocked(id: string) {
+    return this.prismaService.user
+      .findUniqueOrThrow({
+        select: this.prismaHelper.generateSelectFields(UserDto),
+        where: { id: id },
+      })
+      .then((user: UserDto) => {
+        return user.blocked;
       });
   }
 

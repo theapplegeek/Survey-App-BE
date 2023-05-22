@@ -136,6 +136,36 @@ export class UserController {
     return this.userService.updateUser(id, body);
   }
 
+  @Put('block')
+  @ApiProperty({ description: 'Block a user' })
+  @ApiQuery({ name: 'id', description: 'User UUID to block', type: String })
+  @ApiOkResponse({
+    description: 'Return a user blocked',
+    type: UserDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid query params',
+    type: ExceptionResponse<string[]>,
+  })
+  async blockUser(@Query('id') id: string) {
+    return this.userService.blockUser(id);
+  }
+
+  @Put('unlock')
+  @ApiProperty({ description: 'Unlock a user' })
+  @ApiQuery({ name: 'id', description: 'User UUID to unlock', type: String })
+  @ApiOkResponse({
+    description: 'Return a user unlocked',
+    type: UserDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid query params',
+    type: ExceptionResponse<string[]>,
+  })
+  async unlockUser(@Query('id') id: string) {
+    return this.userService.unlockUser(id);
+  }
+
   @Delete()
   @ApiProperty({ description: 'Delete a user' })
   @ApiQuery({ name: 'id', description: 'User UUID to delete', type: String })

@@ -23,7 +23,10 @@ export class AuthService {
         },
       })
       .then(async (user) => {
-        if (!bcrypt.compareSync(userCredentialsDto.password, user.password)) {
+        if (
+          user.blocked ||
+          !bcrypt.compareSync(userCredentialsDto.password, user.password)
+        ) {
           throw new UnauthorizedException('Invalid credentials');
         }
         const payload = new JwtPayloadDto(user.username, user.id);
