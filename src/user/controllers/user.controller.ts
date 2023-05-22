@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   ParseArrayPipe,
   ParseIntPipe,
@@ -15,6 +14,7 @@ import { UserService } from '../services/user.service';
 import { UserCreateDto, UserDto, UserUpdateDto } from '../dtos/user.dto';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -28,9 +28,11 @@ import { SortByPipe } from '../../common/pipes/sort-by-pipe';
 import { ParsePositiveIntPipe } from '../../common/pipes/parse-positive-int.pipe';
 import { CountPayload } from '../../common/models/count-payload.model';
 import { ExceptionResponse } from '../../common/models/exception-response.model';
+import { PublicAPI } from '../../common/decorators/public.decorator';
 
 @Controller('user')
-@ApiTags('user')
+@ApiTags('User')
+@ApiBearerAuth()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -53,7 +55,7 @@ export class UserController {
   })
   @ApiOkResponse({
     description: 'Return a list of users',
-    type: [UserDto],
+    type: UserDto,
     isArray: true,
   })
   @ApiBadRequestResponse({
@@ -105,7 +107,7 @@ export class UserController {
 
   @Post('import')
   @ApiProperty({ description: 'Import a list of users' })
-  @ApiBody({ description: 'List of users', type: [UserCreateDto] })
+  @ApiBody({ description: 'List of users', type: UserCreateDto, isArray: true })
   @ApiOkResponse({
     description: 'Return a count of user created',
     type: CountPayload,

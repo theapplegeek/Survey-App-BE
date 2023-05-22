@@ -9,14 +9,17 @@ async function bootstrap() {
   });
   app.useGlobalPipes(new ValidationPipe());
 
-  const config = new DocumentBuilder()
-    .setTitle('Survey API')
-    .setDescription('The survey API documentation')
-    .setVersion('1.0')
-    .addTag('REST API')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('Survey API')
+      .setDescription('The survey API documentation')
+      .setVersion('1.0')
+      .addTag('REST API')
+      .addBearerAuth()
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('docs', app, document);
+  }
 
   await app.listen(3000);
 }

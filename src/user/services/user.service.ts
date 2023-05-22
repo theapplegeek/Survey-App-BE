@@ -3,13 +3,14 @@ import { PrismaService } from '../../common/database/prisma.service';
 import { UserCreateDto, UserDto, UserUpdateDto } from '../dtos/user.dto';
 import { PrismaHelper } from '../../common/helpers/prisma.helper';
 import { CacheHelper } from '../../common/helpers/cache.helper';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
   constructor(
-    private cacheHelper: CacheHelper,
-    private prismaService: PrismaService,
-    private prismaHelper: PrismaHelper,
+    private readonly cacheHelper: CacheHelper,
+    private readonly prismaService: PrismaService,
+    private readonly prismaHelper: PrismaHelper,
   ) {}
 
   async getUsers(
@@ -57,19 +58,23 @@ export class UserService {
       });
   }
 
-  async createUser(body: UserCreateDto) {
+  createUser(body: UserCreateDto) {
+    body.password = this.hashPassword(body.password);
     return this.prismaService.user
       .create({
         select: this.prismaHelper.generateSelectFields(UserDto),
         data: body,
       })
-      .then((user) => {
+      .then((user: UserDto) => {
         this.cacheHelper.del([/^users:getUsers:.+$/]);
         return user;
       });
   }
 
   importUsers(body: UserCreateDto[]) {
+    body.forEach((user) => {
+      user.password = this.hashPassword(user.password);
+    });
     return this.prismaService.user
       .createMany({
         data: body,
@@ -109,5 +114,10 @@ export class UserService {
         ]);
         return user;
       });
+  }
+
+  private hashPassword(password: string) {
+    const salt = bcrypt.genSaltSync(13);
+    return bcrypt.hashSync(password, salt);
   }
 }
