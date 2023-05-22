@@ -36,6 +36,7 @@ export class AuthController {
   }
 
   @Post('register')
+  @PublicAPI()
   @ApiProperty({ description: 'User register' })
   @ApiBody({ description: 'User to register', type: UserCreateDto })
   @ApiOkResponse({ description: 'User register success' })

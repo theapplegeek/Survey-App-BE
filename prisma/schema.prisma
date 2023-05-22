@@ -9,7 +9,7 @@ datasource db {
 }
 
 model User {
-  id         Int          @id @default(autoincrement())
+  id         String       @id @default(uuid())
   email      String       @unique
   username   String       @unique
   password   String
@@ -26,7 +26,7 @@ model Survey {
   title      String
   createdAt  DateTime @default(now())
   createBy   User     @relation(fields: [createById], references: [id])
-  createById Int
+  createById String
   Answer     Answer[]
 
   @@index([id])
@@ -48,7 +48,7 @@ model AnswerUser {
   answer    Answer   @relation(fields: [answerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   answerId  Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict)
-  userId    Int
+  userId    String
   createdAt DateTime @default(now())
 
   @@id([answerId, userId])

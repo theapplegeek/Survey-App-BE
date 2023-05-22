@@ -7,7 +7,7 @@ import {
 } from 'class-validator';
 
 export class UserDto {
-  constructor(id?: number, username?: string, email?: string) {
+  constructor(id?: string, username?: string, email?: string) {
     this.id = id;
     this.username = username;
     this.email = email;
@@ -15,8 +15,8 @@ export class UserDto {
     this.blocked = false;
   }
 
-  @ApiProperty({ description: 'The id of the user' })
-  id: number;
+  @ApiProperty({ description: 'The UUID of the user' })
+  id: string;
 
   @IsNotEmpty()
   @MinLength(1)

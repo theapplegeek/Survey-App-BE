@@ -38,7 +38,7 @@ export class UserService {
       });
   }
 
-  async getUserById(id: number) {
+  async getUserById(id: string) {
     const cacheKey = `users:getUserById:${id}`;
     const user = await this.cacheHelper.get<UserDto>(cacheKey);
     if (user) return user;
@@ -85,7 +85,7 @@ export class UserService {
       });
   }
 
-  updateUser(id: number, body: UserUpdateDto) {
+  updateUser(id: string, body: UserUpdateDto) {
     return this.prismaService.user
       .update({
         select: this.prismaHelper.generateSelectFields(UserDto),
@@ -101,7 +101,7 @@ export class UserService {
       });
   }
 
-  deleteUser(id: number) {
+  deleteUser(id: string) {
     return this.prismaService.user
       .delete({
         select: this.prismaHelper.generateSelectFields(UserDto),

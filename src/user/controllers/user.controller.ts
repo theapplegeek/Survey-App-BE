@@ -5,7 +5,6 @@ import {
   Get,
   Param,
   ParseArrayPipe,
-  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -28,7 +27,6 @@ import { SortByPipe } from '../../common/pipes/sort-by-pipe';
 import { ParsePositiveIntPipe } from '../../common/pipes/parse-positive-int.pipe';
 import { CountPayload } from '../../common/models/count-payload.model';
 import { ExceptionResponse } from '../../common/models/exception-response.model';
-import { PublicAPI } from '../../common/decorators/public.decorator';
 
 @Controller('user')
 @ApiTags('User')
@@ -72,8 +70,8 @@ export class UserController {
   }
 
   @Get(':id')
-  @ApiProperty({ description: 'Get a user by id' })
-  @ApiParam({ name: 'id', description: 'User id to get', type: Number })
+  @ApiProperty({ description: 'Get a user by UUID' })
+  @ApiParam({ name: 'id', description: 'User UUID to get', type: String })
   @ApiOkResponse({
     description: 'Return a user',
     type: UserDto,
@@ -86,7 +84,7 @@ export class UserController {
     description: 'User not found',
     type: ExceptionResponse<string>,
   })
-  async getUserById(@Param('id', ParsePositiveIntPipe) id: number) {
+  async getUserById(@Param('id') id: string) {
     return this.userService.getUserById(id);
   }
 
@@ -124,7 +122,7 @@ export class UserController {
 
   @Put()
   @ApiProperty({ description: 'Update a user' })
-  @ApiQuery({ name: 'id', description: 'User id to update', type: Number })
+  @ApiQuery({ name: 'id', description: 'User UUID to update', type: String })
   @ApiBody({ description: 'User', type: UserUpdateDto })
   @ApiOkResponse({
     description: 'Return a user updated',
@@ -134,25 +132,22 @@ export class UserController {
     description: 'Invalid query params or body',
     type: ExceptionResponse<string[]>,
   })
-  async updateUser(
-    @Query('id', ParseIntPipe) id: number,
-    @Body() body: UserUpdateDto,
-  ) {
+  async updateUser(@Query('id') id: string, @Body() body: UserUpdateDto) {
     return this.userService.updateUser(id, body);
   }
 
   @Delete()
   @ApiProperty({ description: 'Delete a user' })
-  @ApiQuery({ name: 'id', description: 'User id to delete', type: Number })
+  @ApiQuery({ name: 'id', description: 'User UUID to delete', type: String })
   @ApiOkResponse({
-    description: 'Return user id deleted',
+    description: 'Return user deleted',
     type: UserDto,
   })
   @ApiBadRequestResponse({
     description: 'Invalid path variable',
     type: ExceptionResponse<string[]>,
   })
-  async deleteUser(@Query('id', ParseIntPipe) id: number) {
+  async deleteUser(@Query('id') id: string) {
     return this.userService.deleteUser(id);
   }
 }
