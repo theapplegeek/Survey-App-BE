@@ -17,8 +17,16 @@ model User {
   blocked    Boolean      @default(false)
   Survey     Survey[]
   AnswerUser AnswerUser[]
+  Role       Role        @relation(fields: [roleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  roleId     Int
 
   @@index([id])
+}
+
+model Role {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  User User[]
 }
 
 model Survey {

@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../../common/decorators/public.decorator';
 import { UserService } from '../../user/services/user.service';
-import { JwtPayloadDto } from '../dtos/jwt-payload.dto';
+import { JwtPayload } from '../models/jwt.payload.model';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -29,7 +29,7 @@ export class AuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request);
     if (!token) throw new UnauthorizedException('Access token is missing');
 
-    let user: JwtPayloadDto;
+    let user: JwtPayload;
     let isBlocked: boolean;
 
     try {

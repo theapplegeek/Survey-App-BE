@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class UserCredentialsDto {
+export class UserCredentials {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ description: 'The username of the user' })

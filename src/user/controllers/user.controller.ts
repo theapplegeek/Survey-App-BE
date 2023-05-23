@@ -27,6 +27,8 @@ import { SortByPipe } from '../../common/pipes/sort-by-pipe';
 import { ParsePositiveIntPipe } from '../../common/pipes/parse-positive-int.pipe';
 import { CountPayload } from '../../common/models/count-payload.model';
 import { ExceptionResponse } from '../../common/models/exception-response.model';
+import { Roles } from '../../common/decorators/role.decorator';
+import { Role } from '../../auth/models/role.enum';
 
 @Controller('user')
 @ApiTags('User')
@@ -35,6 +37,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
+  @Roles(Role.User, Role.Admin)
   @ApiProperty({ description: 'List of users' })
   @ApiQuery({ name: 'page', description: 'Page number', type: Number })
   @ApiQuery({ name: 'size', description: 'Page size', type: Number })
@@ -70,6 +73,7 @@ export class UserController {
   }
 
   @Get(':id')
+  @Roles(Role.User, Role.Admin)
   @ApiProperty({ description: 'Get a user by UUID' })
   @ApiParam({ name: 'id', description: 'User UUID to get', type: String })
   @ApiOkResponse({
@@ -89,6 +93,7 @@ export class UserController {
   }
 
   @Post()
+  @Roles(Role.Admin)
   @ApiProperty({ description: 'Create a user' })
   @ApiBody({ description: 'User', type: UserCreateDto })
   @ApiOkResponse({
@@ -104,6 +109,7 @@ export class UserController {
   }
 
   @Post('import')
+  @Roles(Role.Admin)
   @ApiProperty({ description: 'Import a list of users' })
   @ApiBody({ description: 'List of users', type: UserCreateDto, isArray: true })
   @ApiOkResponse({
@@ -121,6 +127,7 @@ export class UserController {
   }
 
   @Put()
+  @Roles(Role.Admin)
   @ApiProperty({ description: 'Update a user' })
   @ApiQuery({ name: 'id', description: 'User UUID to update', type: String })
   @ApiBody({ description: 'User', type: UserUpdateDto })
@@ -137,6 +144,7 @@ export class UserController {
   }
 
   @Put('block')
+  @Roles(Role.Admin)
   @ApiProperty({ description: 'Block a user' })
   @ApiQuery({ name: 'id', description: 'User UUID to block', type: String })
   @ApiOkResponse({
@@ -152,6 +160,7 @@ export class UserController {
   }
 
   @Put('unlock')
+  @Roles(Role.Admin)
   @ApiProperty({ description: 'Unlock a user' })
   @ApiQuery({ name: 'id', description: 'User UUID to unlock', type: String })
   @ApiOkResponse({
@@ -167,6 +176,7 @@ export class UserController {
   }
 
   @Delete()
+  @Roles(Role.Admin)
   @ApiProperty({ description: 'Delete a user' })
   @ApiQuery({ name: 'id', description: 'User UUID to delete', type: String })
   @ApiOkResponse({
