@@ -11,10 +11,12 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ExceptionResponse } from '../../common/models/exception-response.model';
-import { UserCreateDto, UserRegisterDto } from '../../user/dtos/user.dto';
+import { UserRegisterDto } from '../../user/dtos/user.dto';
 import { PublicAPI } from '../../common/decorators/public.decorator';
 import { CustomRequest } from '../../common/models/custom-request.model';
 import { JwtResponse } from '../models/jwt-response.model';
+import { Roles } from '../../common/decorators/role.decorator';
+import { Role } from '../models/role.enum';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -50,6 +52,7 @@ export class AuthController {
 
   @Post('refresh')
   @HttpCode(200)
+  @Roles(Role.User, Role.Admin)
   @ApiBearerAuth()
   @ApiProperty({ description: 'Refresh token' })
   @ApiOkResponse({ description: 'Refresh token success', type: JwtResponse })

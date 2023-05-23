@@ -14,19 +14,4 @@ export class RoleService {
       select: this.prismaHelper.generateSelectFields(RoleDto),
     });
   }
-
-  getUserRole(userId: string) {
-    return this.prisma.user
-      .findUniqueOrThrow({
-        where: {
-          id: userId,
-        },
-        select: {
-          Role: {
-            select: this.prismaHelper.generateSelectFields(RoleDto),
-          },
-        },
-      })
-      .then((user) => user.Role as RoleDto);
-  }
 }
