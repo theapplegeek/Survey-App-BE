@@ -27,7 +27,6 @@ export class AuthService {
         },
       })
       .then(async (user: UserWithPasswordDto) => {
-        console.log(user);
         if (
           user.blocked ||
           !bcrypt.compareSync(userCredentialsDto.password, user.password)

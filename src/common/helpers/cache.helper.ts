@@ -16,7 +16,6 @@ export class CacheHelper {
 
   del(cacheKeys: RegExp[]) {
     this.cacheManager.store.keys().then((keys) => {
-      console.log(keys);
       keys.forEach((key) => {
         for (const cacheKey of cacheKeys) {
           if (key.match(cacheKey)) {

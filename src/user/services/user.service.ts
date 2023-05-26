@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../../common/database/prisma.service';
 import { UserCreateDto, UserDto, UserUpdateDto } from '../dtos/user.dto';
 import { PrismaHelper } from '../../common/helpers/prisma.helper';
@@ -58,23 +62,25 @@ export class UserService {
       });
   }
 
-  createUser(body: UserCreateDto) {
-    body.password = this.hashPassword(body.password);
-    return this.prismaService.user
-      .create({
-        select: this.prismaHelper.generateSelectFields(UserDto),
-        data: body,
-      })
-      .then((user: UserDto) => {
-        this.cacheHelper.del([/^users:getUsers:.+$/]);
-        return user;
-      });
+  async createUser(body: UserCreateDto) {
+    return this.hashPassword(body.password).then((hash) => {
+      body.password = hash;
+      return this.prismaService.user
+        .create({
+          select: this.prismaHelper.generateSelectFields(UserDto),
+          data: body,
+        })
+        .then((user: UserDto) => {
+          this.cacheHelper.del([/^users:getUsers:.+$/]);
+          return user;
+        });
+    });
   }
 
-  importUsers(body: UserCreateDto[]) {
-    body.forEach((user) => {
-      user.password = this.hashPassword(user.password);
-    });
+  async importUsers(body: UserCreateDto[]) {
+    for (const user of body) {
+      user.password = await this.hashPassword(user.password);
+    }
     return this.prismaService.user
       .createMany({
         data: body,
@@ -155,12 +161,13 @@ export class UserService {
         where: { id: id },
       })
       .then((user: UserDto) => {
+        if (user.blocked) throw new UnauthorizedException('User is blocked');
         return user.blocked;
       });
   }
 
-  private hashPassword(password: string) {
-    const salt = bcrypt.genSaltSync(13);
-    return bcrypt.hashSync(password, salt);
+  private async hashPassword(password: string) {
+    const salt = await bcrypt.genSalt(13);
+    return bcrypt.hash(password, salt);
   }
 }

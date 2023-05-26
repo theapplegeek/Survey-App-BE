@@ -16,8 +16,8 @@ model User {
   createdAt  DateTime     @default(now())
   blocked    Boolean      @default(false)
   Survey     Survey[]
-  AnswerUser AnswerUser[]
-  Role       Role        @relation(fields: [roleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  SurveyUser SurveyUser[]
+  Role       Role         @relation(fields: [roleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   roleId     Int
 
   @@index([id])
@@ -30,12 +30,13 @@ model Role {
 }
 
 model Survey {
-  id         String   @id @default(uuid())
+  id         String       @id @default(uuid())
   title      String
-  createdAt  DateTime @default(now())
-  createBy   User     @relation(fields: [createById], references: [id])
+  createdAt  DateTime     @default(now())
+  createBy   User         @relation(fields: [createById], references: [id])
   createById String
   Answer     Answer[]
+  SurveyUser SurveyUser[]
 
   @@index([id])
   @@index([createById])
@@ -46,25 +47,35 @@ model Answer {
   description String
   survey      Survey       @relation(fields: [surveyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   surveyId    String
-  AnswerUser  AnswerUser[]
+  SurveyUser  SurveyUser[]
 
   @@index([id])
   @@index([surveyId])
 }
 
-model AnswerUser {
+model SurveyUser {
+  survey    Survey   @relation(fields: [surveyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  surveyId  String
   answer    Answer   @relation(fields: [answerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   answerId  Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict)
   userId    String
   createdAt DateTime @default(now())
 
-  @@id([answerId, userId])
-  @@index([answerId, userId])
+  @@id([answerId, userId, surveyId])
+  @@unique([userId, surveyId])
+  @@index([answerId, userId, surveyId])
 }
 
 view SurveyWithAnswer {
   id            String @unique
   surveyTitle   String
   respondsCount Int
+}
+
+view AnswerStats {
+  surveyId    String
+  id          Int    @unique
+  description String
+  percentage  Float
 }

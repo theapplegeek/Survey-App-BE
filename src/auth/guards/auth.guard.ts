@@ -19,22 +19,19 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const isPublic: boolean = this.reflector.getAllAndOverride<boolean>(
+      IS_PUBLIC_KEY,
+      [context.getHandler(), context.getClass()],
+    );
     if (isPublic) return true;
 
     const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
+    const token: string = this.extractTokenFromHeader(request);
     if (!token) throw new UnauthorizedException('Access token is missing');
 
-    let user: JwtPayload;
-    let isBlocked: boolean;
-
     try {
-      user = await this.jwtService.verifyAsync(token);
-      isBlocked = await this.userService.userIsBlocked(user.sub);
+      const user: JwtPayload = await this.jwtService.verifyAsync(token);
+      await this.userService.userIsBlocked(user.sub);
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
       request['user'] = user;
@@ -42,8 +39,6 @@ export class AuthGuard implements CanActivate {
     } catch {
       throw new UnauthorizedException('Invalid access token');
     }
-
-    if (isBlocked) throw new UnauthorizedException('User is blocked');
 
     return true;
   }
