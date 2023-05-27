@@ -10,6 +10,7 @@ import { AnswerStats, Prisma } from '@prisma/client';
 import { AnswerDto } from '../dtos/answer.dto';
 import { UserDto } from '../../user/dtos/user.dto';
 import { AnswerService } from './answer.service';
+import { CacheHelper } from '../../common/helpers/cache.helper';
 
 @Injectable()
 export class SurveyService {
@@ -20,6 +21,7 @@ export class SurveyService {
   };
 
   constructor(
+    private readonly cacheHelper: CacheHelper,
     private readonly prisma: PrismaService,
     private readonly prismaHelper: PrismaHelper,
     private readonly answerService: AnswerService,
@@ -42,12 +44,17 @@ export class SurveyService {
         take: size,
         orderBy: { [orderBy ?? 'createdAt']: sortBy ?? 'desc' },
       })
-      .then((surveys: any) =>
+      .then((surveys: any) => {
         surveys.map((survey) => {
           survey.createBy = survey.createBy.username;
           return survey;
-        }),
-      );
+        });
+        this.cacheHelper.set(
+          `survey:getAllSurveys:${page}-${size}-${orderBy}-${sortBy}`,
+          surveys,
+        );
+        return surveys;
+      });
   }
 
   getAllSurveysOwnedByUser(
@@ -73,12 +80,17 @@ export class SurveyService {
         take: size,
         orderBy: { [orderBy ?? 'createdAt']: sortBy ?? 'desc' },
       })
-      .then((surveys: any) =>
+      .then((surveys: any) => {
         surveys.map((survey) => {
           survey.createBy = survey.createBy.username;
           return survey;
-        }),
-      );
+        });
+        this.cacheHelper.set(
+          `survey:getAllSurveysOwnedByUser:${page}-${size}-${orderBy}-${sortBy}-${sub}`,
+          surveys,
+        );
+        return surveys;
+      });
   }
 
   async getSurveyById(id: string, sub: string) {
@@ -110,14 +122,26 @@ export class SurveyService {
         return answer;
       });
     }
+    await this.cacheHelper.set(
+      `survey:getSurveyById:${id}-${sub}`,
+      surveyDetail,
+    );
     return surveyDetail;
   }
 
   createSurvey(body: Prisma.SurveyUncheckedCreateInput) {
-    return this.prisma.survey.create({
-      select: this.surveySelector,
-      data: body,
-    });
+    return this.prisma.survey
+      .create({
+        select: this.surveySelector,
+        data: body,
+      })
+      .then((survey: any) => {
+        this.cacheHelper.del([
+          /^survey:getAllSurveys:.+$/,
+          /^survey:getAllSurveysOwnedByUser:.+$/,
+        ]);
+        return survey;
+      });
   }
 
   async answerSurvey(body: SurveyAnswerDto, sub: string) {
@@ -128,6 +152,10 @@ export class SurveyService {
         userId: sub,
       },
     });
+    this.cacheHelper.del([
+      new RegExp(`^answer:getAnswerStats:${survey.id}$`),
+      new RegExp(`^survey:getSurveyById:${survey.id}-${sub}$`),
+    ]);
     return this.getSurveyById(survey.id, sub);
   }
 
@@ -149,6 +177,11 @@ export class SurveyService {
       })
       .then((survey: any) => {
         survey.createBy = survey.createBy.username;
+        this.cacheHelper.del([
+          /^survey:getAllSurveys:.+$/,
+          /^survey:getAllSurveysOwnedByUser:.+$/,
+          new RegExp(`^survey:getSurveyById:${id}-.*$`),
+        ]);
         return survey;
       });
   }

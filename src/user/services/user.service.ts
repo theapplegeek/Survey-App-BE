@@ -23,7 +23,7 @@ export class UserService {
     orderBy?: string,
     sortBy?: string,
   ) {
-    const cacheKey = `users:getUsers:${page}-${size}-${orderBy}-${sortBy}`;
+    const cacheKey = `user:getUsers:${page}-${size}-${orderBy}-${sortBy}`;
     const users = await this.cacheHelper.get<UserDto[]>(cacheKey);
     if (users) return users;
 
@@ -43,7 +43,7 @@ export class UserService {
   }
 
   async getUserById(id: string) {
-    const cacheKey = `users:getUserById:${id}`;
+    const cacheKey = `user:getUserById:${id}`;
     const user = await this.cacheHelper.get<UserDto>(cacheKey);
     if (user) return user;
 
@@ -71,7 +71,7 @@ export class UserService {
           data: body,
         })
         .then((user: UserDto) => {
-          this.cacheHelper.del([/^users:getUsers:.+$/]);
+          this.cacheHelper.del([/^user:getUsers:.+$/]);
           return user;
         });
     });
@@ -86,7 +86,7 @@ export class UserService {
         data: body,
       })
       .then((users) => {
-        this.cacheHelper.del([/^users:getUsers:.+$/]);
+        this.cacheHelper.del([/^user:getUsers:.+$/]);
         return users;
       });
   }

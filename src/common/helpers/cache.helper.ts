@@ -14,6 +14,10 @@ export class CacheHelper {
     return this.cacheManager.set(key, value);
   }
 
+  setWithTTL<T>(key: string, value: T, ttl: number) {
+    return this.cacheManager.set(key, value, ttl);
+  }
+
   del(cacheKeys: RegExp[]) {
     this.cacheManager.store.keys().then((keys) => {
       keys.forEach((key) => {
