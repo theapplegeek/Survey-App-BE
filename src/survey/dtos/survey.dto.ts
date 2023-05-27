@@ -1,7 +1,7 @@
 import { UserDto } from '../../user/dtos/user.dto';
 import { AnswerDto, AnswerWithStatDto } from './answer.dto';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { IsArray, IsIn, IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsInt, IsNotEmpty, IsString } from 'class-validator';
 import { MinArrayLength } from '../../common/decorators/min-array-length.decorator';
 
 export class SurveyDto {

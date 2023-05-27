@@ -7,6 +7,7 @@ import { json } from 'express';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: true,
+    snapshot: true,
   });
   app.use(json({ limit: '10mb' }));
   app.useGlobalPipes(new ValidationPipe());
