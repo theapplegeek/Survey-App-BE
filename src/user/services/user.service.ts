@@ -8,6 +8,7 @@ import { UserCreateDto, UserDto, UserUpdateDto } from '../dtos/user.dto';
 import { PrismaHelper } from '../../common/helpers/prisma.helper';
 import { CacheHelper } from '../../common/helpers/cache.helper';
 import * as bcrypt from 'bcrypt';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UserService {
@@ -55,10 +56,6 @@ export class UserService {
       .then((user) => {
         this.cacheHelper.set(cacheKey, user);
         return user;
-      })
-      .catch((err) => {
-        if (err.code === 'P2025') throw new NotFoundException(err.message);
-        throw err;
       });
   }
 

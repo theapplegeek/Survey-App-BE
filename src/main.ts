@@ -3,14 +3,18 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { json } from 'express';
+import { PrismaExceptionFilter } from './common/filters/prisma.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: true,
     snapshot: true,
   });
-  app.use(json({ limit: '10mb' }));
   app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalFilters(new PrismaExceptionFilter());
+
+  app.use(json({ limit: '10mb' }));
+
   app.setGlobalPrefix('api');
   app.enableVersioning({
     type: VersioningType.URI,
