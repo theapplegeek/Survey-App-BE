@@ -1,14 +1,9 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../../common/database/prisma.service';
 import { UserCreateDto, UserDto, UserUpdateDto } from '../dtos/user.dto';
 import { PrismaHelper } from '../../common/helpers/prisma.helper';
 import { CacheHelper } from '../../common/helpers/cache.helper';
 import * as bcrypt from 'bcrypt';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UserService {

@@ -13,6 +13,7 @@ services:
     build: .
     environment:
       DATABASE_URL: postgresql://postgres:sup3rStr0ngPassw0rd@db:5432/survey-app
+      JWT_SECRET: 46w6br1zlF480jVHRW5KhLh3lc1MUwYbCdbEFyMPxILwH5ws57Q9V1Ntn1hl2ixr1md
     ports:
       - 3000:3000
     depends_on:

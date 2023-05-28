@@ -2,19 +2,19 @@ services:
   db:
     image: postgres:15.3-alpine
     environment:
-      POSTGRES_DB: survey-app
+      POSTGRES_DB: survey-app-test
       POSTGRES_PASSWORD: sup3rStr0ngPassw0rd
     ports:
       - 5432:5432
     volumes:
-      - survey-app-dev-data:/var/lib/postgresql/data
+      - survey-app-test-data:/var/lib/postgresql/data
 
   server:
     build:
       context: .
       dockerfile: Dockerfile-dev
     environment:
-      DATABASE_URL: postgresql://postgres:sup3rStr0ngPassw0rd@db:5432/survey-app
+      DATABASE_URL: postgresql://postgres:sup3rStr0ngPassw0rd@db:5432/survey-app-test
       JWT_SECRET: 46w6br1zlF480jVHRW5KhLh3lc1MUwYbCdbEFyMPxILwH5ws57Q9V1Ntn1hl2ixr1md
     ports:
       - 3000:3000
@@ -22,9 +22,9 @@ services:
       - 8080:8080
     volumes:
       - ./:/usr/src/app/
-    command: npm run start:dev
+    command: npx prisma migrate dev && npm run test:e2e
     depends_on:
       - db
 
 volumes:
-  survey-app-dev-data:
+  survey-app-test-data:

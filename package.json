@@ -15,11 +15,12 @@
     "command": "docker compose -f compose-dev.yml run --rm server",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
+    "test": "jest --maxWorkers=50%",
+    "test:watch": "jest --maxWorkers=50% --watch",
+    "test:cov": "jest --maxWorkers=50% --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:docker:e2e": "docker compose -f compose-test.yml run --rm server",
     "generate:compodoc": "npx @compodoc/compodoc -p tsconfig.json -s"
   },
   "dependencies": {
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "@compodoc/compodoc": "^1.1.20",
+    "@golevelup/ts-jest": "^0.3.7",
     "@nestjs/cli": "^9.0.0",
     "@nestjs/schematics": "^9.0.0",
     "@nestjs/testing": "^9.0.0",
