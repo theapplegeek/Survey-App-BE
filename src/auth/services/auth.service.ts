@@ -34,7 +34,7 @@ export class AuthService {
           throw new UnauthorizedException('Invalid credentials');
         }
         const payload = new JwtPayload(user.username, user.id, user.Role.name);
-        return this.generateTokens(payload);
+        return await this.generateTokens(payload);
       })
       .catch((err) => {
         if (err.code === 'P2025') {
@@ -52,23 +52,25 @@ export class AuthService {
     userCreateDto.roleId = userRole.id;
     const user = await this.userService.createUser(userCreateDto);
     const payload = new JwtPayload(user.username, user.id, user.Role.name);
-    return this.generateTokens(payload);
+    return await this.generateTokens(payload);
   }
 
-  refreshToken(refreshToken: string) {
+  async refreshToken(refreshToken: string) {
     try {
-      const { username, sub, role } = this.jwtService.verify(refreshToken);
+      const { username, sub, role } = await this.jwtService.verifyAsync(
+        refreshToken,
+      );
       const payload = new JwtPayload(username, sub, role);
-      const accessToken = this.jwtService.sign({ ...payload });
+      const accessToken = await this.jwtService.signAsync({ ...payload });
       return new JwtResponse(accessToken, refreshToken);
     } catch (err) {
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
 
-  private generateTokens(payload: JwtPayload) {
-    const accessToken = this.jwtService.sign({ ...payload });
-    const refreshToken = this.jwtService.sign(
+  async generateTokens(payload: JwtPayload) {
+    const accessToken = await this.jwtService.signAsync({ ...payload });
+    const refreshToken = await this.jwtService.signAsync(
       { ...payload },
       {
         expiresIn: '12h',

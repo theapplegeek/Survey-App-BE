@@ -25,6 +25,7 @@ import { JwtModule } from '@nestjs/jwt';
   ],
   exports: [
     CacheHelper,
+    JwtModule,
     PrismaService,
     PrismaHelper,
     SortByPipe,

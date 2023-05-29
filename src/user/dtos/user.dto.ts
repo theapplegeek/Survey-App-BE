@@ -115,10 +115,10 @@ export class UserUpdateDto extends OmitType(UserDto, [
 export class UserWithPasswordDto extends UserDto {
   constructor(
     id?: string,
-    username?: string,
     email?: string,
-    role?: RoleDto,
+    username?: string,
     password?: string,
+    role?: RoleDto,
   ) {
     super(id, username, email, role);
     this.password = password;

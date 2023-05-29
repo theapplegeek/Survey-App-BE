@@ -53,11 +53,9 @@ describe('AuthGuard', () => {
       expect(canActivate).resolves.toBe(true);
     });
 
-    it('should return UnauthorizedException when token is missing', () => {
+    it('should throw UnauthorizedException when token is missing', () => {
       reflect.getAllAndOverride = jest.fn().mockReturnValue(false);
-      jest
-        .spyOn(guard, 'extractTokenFromHeader' as any)
-        .mockReturnValue(undefined);
+      guard.extractTokenFromHeader = jest.fn().mockReturnValue(undefined);
 
       const context = createMock<ExecutionContext>();
       const canActivate = guard.canActivate(context);
@@ -66,11 +64,9 @@ describe('AuthGuard', () => {
       expect(canActivate).rejects.toThrowError('Access token is missing');
     });
 
-    it('should return UnauthorizedException when token is invalid', () => {
+    it('should throw UnauthorizedException when token is invalid', () => {
       reflect.getAllAndOverride = jest.fn().mockReturnValue(false);
-      jest
-        .spyOn(guard, 'extractTokenFromHeader' as any)
-        .mockReturnValue('invalid-token');
+      guard.extractTokenFromHeader = jest.fn().mockReturnValue('invalid-token');
       jwtService.verifyAsync = jest
         .fn()
         .mockRejectedValue(new Error('invalid-token'));
@@ -82,13 +78,11 @@ describe('AuthGuard', () => {
       expect(canActivate).rejects.toThrowError('Invalid access token');
     });
 
-    it('should return UnauthorizedException when user is blocked', () => {
+    it('should throw UnauthorizedException when user is blocked', () => {
       const jwtPayload: JwtPayload = new JwtPayload('user', 'user-sub', 'USER');
 
       reflect.getAllAndOverride = jest.fn().mockReturnValue(false);
-      jest
-        .spyOn(guard, 'extractTokenFromHeader' as any)
-        .mockReturnValue('token');
+      guard.extractTokenFromHeader = jest.fn().mockReturnValue('valid-token');
       jwtService.verifyAsync = jest.fn().mockResolvedValue(jwtPayload);
       userService.userIsBlocked = jest
         .fn()
@@ -105,9 +99,7 @@ describe('AuthGuard', () => {
       const jwtPayload: JwtPayload = new JwtPayload('user', 'user-sub', 'USER');
 
       reflect.getAllAndOverride = jest.fn().mockReturnValue(false);
-      jest
-        .spyOn(guard, 'extractTokenFromHeader' as any)
-        .mockReturnValue('token');
+      guard.extractTokenFromHeader = jest.fn().mockReturnValue('valid-token');
       jwtService.verifyAsync = jest.fn().mockResolvedValue(jwtPayload);
       userService.userIsBlocked = jest.fn().mockResolvedValue(false);
 
