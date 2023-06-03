@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserRegisterDto } from '../../src/user/dtos/user.dto';
 import { setupAppConfiguration } from '../../src/app.config';
 import { UserCredentials } from '../../src/auth/models/user-credentials.model';
+import { Role } from '../../src/auth/models/role.enum';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
@@ -40,6 +41,7 @@ describe('AuthController (e2e)', () => {
   });
 
   afterAll(async () => {
+    await prisma.user.deleteMany();
     await prisma.$disconnect();
     await app.close();
   });
@@ -131,6 +133,41 @@ describe('AuthController (e2e)', () => {
         .expect(200)
         .expect(jwtResponseCheck);
     });
+
+    it('should throw unauthorizedException when refresh token is invalid', async () => {
+      return request(app.getHttpServer())
+        .post('/api/v1/auth/refresh')
+        .auth('invalid-token', { type: 'bearer' })
+        .expect(401)
+        .expect(unauthorizedExceptionCheck);
+    });
+
+    it('should throw unauthorizedException when refresh token payload is invalid', async () => {
+      const refreshToken = await jwtService.signAsync({
+        sub: 'UNKNOWN_USER_ID',
+        username: 'UNKNOWN_USER',
+        role: Role.User,
+      });
+
+      return request(app.getHttpServer())
+        .post('/api/v1/auth/refresh')
+        .auth(refreshToken, { type: 'bearer' })
+        .expect(401)
+        .expect(unauthorizedExceptionCheck);
+    });
+
+    it('should throw unauthorizedException when user is blocked', async () => {
+      await prisma.user.update({
+        data: { blocked: true },
+        where: { email: userRegister.email },
+      });
+
+      return request(app.getHttpServer())
+        .post('/api/v1/auth/refresh')
+        .auth(refreshToken, { type: 'bearer' })
+        .expect(401)
+        .expect(unauthorizedExceptionCheck);
+    });
   });
 
   const jwtResponseCheck = (res: request.Response) => {
@@ -140,5 +177,14 @@ describe('AuthController (e2e)', () => {
     expect(
       jwtService.verifyAsync(res.body.refresh_token),
     ).resolves.toBeTruthy();
+  };
+
+  const unauthorizedExceptionCheck = (res: request.Response) => {
+    expect(res.body).toHaveProperty('statusCode');
+    expect(res.body).toHaveProperty('message');
+    expect(res.body).toHaveProperty('error');
+    expect(res.body.statusCode).toBe(401);
+    expect(res.body.message).toBe('Invalid access token');
+    expect(res.body.error).toBe('Unauthorized');
   };
 });
