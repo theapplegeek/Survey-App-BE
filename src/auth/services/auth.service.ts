@@ -5,11 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { JwtResponse } from '../models/jwt-response.model';
 import { UserService } from '../../user/services/user.service';
-import {
-  UserCreateDto,
-  UserRegisterDto,
-  UserWithPasswordDto,
-} from '../../user/dtos/user.dto';
+import { UserRegisterDto, UserWithPasswordDto } from '../../user/dtos/user.dto';
 import { JwtPayload } from '../models/jwt.payload.model';
 import { PrismaHelper } from '../../common/helpers/prisma.helper';
 import { Role } from '../models/role.enum';
