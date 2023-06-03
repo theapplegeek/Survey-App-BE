@@ -7,7 +7,6 @@ import { JwtService } from '@nestjs/jwt';
 import { UserRegisterDto } from '../../src/user/dtos/user.dto';
 import { setupAppConfiguration } from '../../src/app.config';
 import { UserCredentials } from '../../src/auth/models/user-credentials.model';
-import { JwtPayload } from '../../src/auth/models/jwt.payload.model';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
