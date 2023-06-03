@@ -15,8 +15,6 @@ export class PrismaExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const { status, message } = this.getStatusAndMessage(exception);
 
-    console.log(exception);
-
     response.status(status).json({
       statusCode: status,
       message: message,

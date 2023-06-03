@@ -99,7 +99,7 @@ export class UserRegisterDto extends OmitType(UserDto, [
 
   @IsEmpty()
   @ApiProperty({ description: 'The role id of the user' })
-  roleId: number;
+  roleId?: number;
 }
 
 export class UserUpdateDto extends OmitType(UserDto, [

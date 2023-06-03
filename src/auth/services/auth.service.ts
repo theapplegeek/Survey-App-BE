@@ -5,7 +5,11 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { JwtResponse } from '../models/jwt-response.model';
 import { UserService } from '../../user/services/user.service';
-import { UserRegisterDto, UserWithPasswordDto } from '../../user/dtos/user.dto';
+import {
+  UserCreateDto,
+  UserRegisterDto,
+  UserWithPasswordDto,
+} from '../../user/dtos/user.dto';
 import { JwtPayload } from '../models/jwt.payload.model';
 import { PrismaHelper } from '../../common/helpers/prisma.helper';
 import { Role } from '../models/role.enum';
@@ -18,6 +22,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly userService: UserService,
   ) {}
+
   login(userCredentialsDto: UserCredentials) {
     return this.prisma.user
       .findUniqueOrThrow({
@@ -49,8 +54,10 @@ export class AuthService {
       select: { id: true },
       where: { name: Role.User },
     });
-    userCreateDto.roleId = userRole.id;
-    const user = await this.userService.createUser(userCreateDto);
+    const user = await this.userService.createUser({
+      ...userCreateDto,
+      roleId: userRole.id,
+    });
     const payload = new JwtPayload(user.username, user.id, user.Role.name);
     return await this.generateTokens(payload);
   }

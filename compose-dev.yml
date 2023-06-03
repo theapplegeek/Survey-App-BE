@@ -22,9 +22,11 @@ services:
       - 8080:8080
     volumes:
       - ./:/usr/src/app/
+      - survey-app-dev-deps:/usr/src/app/node_modules
     command: npm run start:dev
     depends_on:
       - db
 
 volumes:
   survey-app-dev-data:
+  survey-app-dev-deps:

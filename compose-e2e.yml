@@ -14,12 +14,12 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:sup3rStr0ngPassw0rd@db:5432/survey-app-test
       JWT_SECRET: 46w6br1zlF480jVHRW5KhLh3lc1MUwYbCdbEFyMPxILwH5ws57Q9V1Ntn1hl2ixr1md
-    ports:
-      - 3000:3000
-      - 5555:5555
-      - 8080:8080
     volumes:
       - ./:/usr/src/app/
-    command: npx prisma migrate dev && npm run test:e2e
+      - survey-app-dev-deps:/usr/src/app/node_modules
+    entrypoint: sh ./script/e2e.sh
     depends_on:
       - db
+
+volumes:
+  survey-app-dev-deps:
